@@ -14,12 +14,6 @@ with app.app_context():
     db.create_all()
     n = Question.query.order_by(desc("id")).first().id
 
-
-#Api will return answer 4 after answer two, dependency answer for question 3 is not fulfilled but for 4 is
-#curl http://localhost:5000/api/question/ -d '{"id":2,"answer":"no"}' -X POST -H "Content-Type: application/json"
-#curl http://localhost:5000/api/question/ -d '{"id":3,"answer":"yes"}' -X POST -H "Content-Type: application/json"
-#curl http://localhost:5000/api/question/ -d '{"id":4,"answer":"yes"}' -X POST -H "Content-Type: application/json"
-
 answers = {}
 
 @app.route('/', methods=['GET'])
@@ -29,8 +23,6 @@ def answer():
 
 @app.route('/api/question/', methods=['POST'])
 def survey():
-    print (n)
-
     current = request.get_json().get("id")
     answers[current] = request.get_json().get("answer")
 
@@ -40,10 +32,9 @@ def survey():
     while next <= n:
         deps = Dependency.query.filter_by(question_id_dependant=next)
         depend_fulfilled = True
-        count = deps.count()
         if deps.count() > 0:
             for d in deps:
-                #Dependenden answer does not exist or does not match
+                #Dependendent answer does not exist or does not match
                 if not (d.question_id_answer in answers and answers[d.question_id_answer] == d.answer):
                     depend_fulfilled = False
                     break
